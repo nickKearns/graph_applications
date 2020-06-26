@@ -134,7 +134,7 @@ def turn_matrix_into_graph(matrix: [[int]]):
 
 #This function is used and combined with the above function to find the number of
 #islands in a 2d array of integers (matrix)
-def get_connected_components(graph):
+def numIslands(graph):
 
     #this set will contain vertex objects
     visited = set()
@@ -144,7 +144,7 @@ def get_connected_components(graph):
     def get_cc_recursive(current_vertex: Vertex, visited_vertices, connected_vertices):
         visited_vertices.add(current_vertex)
         connected_vertices.append(current_vertex.id)
-        print(current_vertex)
+        # print(current_vertex)
 
         for neighbor in current_vertex.get_neighbors():
             # print(neighbor.__str__() + " is a neighbor to " + current_vertex.__str__())
@@ -171,7 +171,7 @@ def get_connected_components(graph):
 #it is possible that not all oranges can be turned rotten because there could be orange(s) not connected
 #to other rotten oranges
 
-def rotten_oranges(matrix: [[int]]):
+def timeToRot(matrix: [[int]]):
     minutes = -1
     visited = set()
 
@@ -228,32 +228,78 @@ def rotten_oranges(matrix: [[int]]):
 
 
 
+#THIS IS QUESTION 3:
+#Class Scheduling
+#There are a number of courses starting at 0 going to n-1
+#course can have prerequisites that need to be taken before that course can be taken
+#these relationships between courses are expressed as pairs 
+#Example: (1,0) to take course 1 you must have had to have taken course 0 before
+#this problem can be solved using a topological sort algorithm such as Kahns algorithm
+
+def courseOrder(numCourses, prerequisites):
+
+    #keep a dictionary to track the in-degree of each course vertex
+    in_degrees_dict = {}
 
 
 
-# def bfs_traversal(graph):
+    for course, prereq in prerequisites:
+        
 
-#     seen = set()
-#     start_vertex = graph[(0,0)]
-#     seen.add(start_vertex)
+        if course in in_degrees_dict:
+            #if that course is already in the in-degree dictionary then add one more to its in-degree
+            in_degrees_dict[course] += 1
+        #if it isnt in the in-degree dict then add it and give it a value of 1
+        #because it is in the prereq list it has 1 in-degree currently
+        else:
+            in_degrees_dict[course] = 1
 
-#     distance_away = 0
+        if prereq not in in_degrees_dict:
+            in_degrees_dict[prereq] = 0
 
-#     queue = deque()
+            '''the prereqs are one of the only courses that could possibly have an in-degree of 0 
+                so set it to zero here and if it happens to be a course that has prereqs later in the 
+                prereqs list then it will be assigned the correct in-degree in the above if statement
+                the only courses with an in-degree of 0 at the end will either only appear as a prereq in the 
+                prereq list or it will not appear at all in the prereq list but could be included through the numCourses
+                example of that would be a course that isnt a prereq to anything else but it is a course regardless
+                that would be a single vertex with no edges in a graph
+                so that has to be checked for later in this function'''
 
-#     queue.append(start_vertex)
 
-
-#     while queue:
-#         current_vertex = queue.popleft()
+    top_sort = []
 
 
 
-#         for neighbor in current_vertex.get_neighbors():
-#             if neighbor not in seen:
-#                 seen.add(neighbor)
-#                 queue.append(neighbor)
-#     return distance_away
+    while len(in_degrees_dict) > 0:
+
+
+        current_course_in_degree_zero = None
+
+        # print(in_degrees_dict)
+        for course in in_degrees_dict:
+            #find any courses with 0 in-degree
+            if in_degrees_dict[course] == 0:
+                current_course_in_degree_zero = course
+        #append the current course to our top sort answer
+        top_sort.append(current_course_in_degree_zero)
+
+
+        in_degrees_dict.__delitem__(current_course_in_degree_zero)
+
+        
+        for course, prereq in prerequisites:
+            if current_course_in_degree_zero == prereq:
+                #find the course(s) that has our current course as a prereq and decrement its in-degree by 1
+                in_degrees_dict[course] -= 1
+            
+        #delete the current course with in degree zero from the in-degrees dictionary so it does not 
+        #keep becoming the current course 
+    return top_sort
+
+
+ 
+
 
 
 
@@ -273,47 +319,60 @@ if __name__ == "__main__":
     #THIS IS QUESTION 1:
     #HOW MANY ISLANDS ARE THERE
 
-    # map1 = [
-    # [1, 1, 1, 1, 0],
-    # [1, 1, 0, 1, 0],
-    # [1, 1, 0, 0, 0],
-    # [0, 0, 0, 0, 0]
-    # ]
-    # graph = turn_matrix_into_graph(map1)
-    # print(len(get_connected_components(graph)))
+    map1 = [
+    [1, 1, 1, 1, 0],
+    [1, 1, 0, 1, 0],
+    [1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+    ]
+    graph = turn_matrix_into_graph(map1)
+    print(len(numIslands(graph)))
 
-    # map2 = [
-    # [1, 1, 0, 0, 0],
-    # [1, 1, 0, 0, 0],
-    # [0, 0, 1, 0, 0],
-    # [0, 0, 0, 1, 1]
-    # ]
-    # graph2 = turn_matrix_into_graph(map2)
-    # print(len(get_connected_components(graph2)))
+    map2 = [
+    [1, 1, 0, 0, 0],
+    [1, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 1]
+    ]
+    graph2 = turn_matrix_into_graph(map2)
+    print(len(numIslands(graph2)))
 
 
-    oranges_graph = [
+
+    
+
+    oranges1 = [
         [2,1,1],
         [1,1,0],
         [0,1,1]
     ]
+    print(timeToRot(oranges1))
 
     oranges2 = [
     [2,1,1],
     [0,1,1],
     [1,0,1]
     ]
+    print(timeToRot(oranges2))
 
     oranges3 = [
     [0,2]
     ]
 
-    print(rotten_oranges(oranges3))
+    print(timeToRot(oranges3))
+
+
+    courses1 = [ [1,0] ]
+    print(courseOrder(2, courses1))
+
+    courses2 = [ [1,0], [2,0], [3,1], [3,2] ]
+
+    print(courseOrder(4, courses2))
 
     
 
 
+            
                         
 
 
-            

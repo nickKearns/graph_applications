@@ -159,6 +159,74 @@ def get_connected_components(graph):
             get_cc_recursive(vertex, visited, current_connected_vertices)
 
             connected_comps.append(current_connected_vertices)
+    return connected_comps
+
+
+#QUESTION 2:
+#rotten oranges
+#given a matrix of integers where 2 is a rotten orange, 1 is a fresh orange and 0 denotes no orange
+#the rotten orange turns all oranges it is adjacent to into rotten oranges
+#each minute the rotten orange(s) will turn its neighbors rotten
+#return how many steps(minutes) it would take to turn all oranges rotten
+#it is possible that not all oranges can be turned rotten because there could be orange(s) not connected
+#to other rotten oranges
+
+def rotten_oranges(matrix: [[int]]):
+    minutes = -1
+    visited = set()
+
+    queue = deque()
+
+    for row in range(len(matrix)):
+        for col in range(len(matrix[0])):
+            if matrix[row][col] == 2:
+                queue.append((row, col))
+    if len(queue) == 0:
+        return -1
+
+    
+    while queue:
+
+        
+
+        current_rotten_oranges = []
+
+        for (row, col) in queue.copy():
+
+
+            matrix[row][col] = 2
+            current_rotten_oranges.append((row,col))
+            visited.add((row,col))
+
+            #here is where we check all the neighbors around the current spot in the matrix
+            if row+1 < len(matrix):
+                if matrix[row+1][col] == 1:
+                    if (row+1, col) not in visited:
+                        queue.append((row+1, col))
+            if row-1 >= 0:
+                if matrix[row-1][col] == 1:
+                    if (row-1, col) not in visited:
+                        queue.append((row-1, col))
+            if col+1 < len(matrix[0]):
+                if matrix[row][col+1] == 1:
+                    if (row, col+1) not in visited:
+                        queue.append((row, col+1))
+            if col-1 >= 0:
+                if matrix[row][col-1] == 1:
+                    if (row, col-1) not in visited:
+                        queue.append((row, col-1))
+
+            queue.remove((row, col))
+        minutes += 1
+
+    for row in range(len(matrix)):
+        for col in range(len(matrix[0])):
+            if matrix[row][col] == 1:
+                return -1
+
+    return minutes
+
+
 
 
 
@@ -191,7 +259,7 @@ def get_connected_components(graph):
 
 
 
-    return connected_comps
+
 
 
 
@@ -225,14 +293,22 @@ if __name__ == "__main__":
 
 
     oranges_graph = [
-        [1,1,1],
+        [2,1,1],
         [1,1,0],
         [0,1,1]
     ]
 
-    graph = turn_matrix_into_graph(oranges_graph)
-    print(bfs_traversal(graph))
+    oranges2 = [
+    [2,1,1],
+    [0,1,1],
+    [1,0,1]
+    ]
 
+    oranges3 = [
+    [0,2]
+    ]
+
+    print(rotten_oranges(oranges3))
 
     
 
